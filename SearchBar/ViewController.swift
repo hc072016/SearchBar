@@ -16,6 +16,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.init(red: 194 / 255, green: 255 / 255, blue: 240 / 255, alpha: 1)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: ViewController.defaultTableViewCellReuseIdentifier)
     }
     
@@ -36,7 +41,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
      let cell = tableView.dequeueReusableCell(withIdentifier: ViewController.defaultTableViewCellReuseIdentifier, for: indexPath)
      
      // Configure the cell...
-        cell.textLabel?.text = "\(indexPath.row)"
+        cell.textLabel?.text = "#\(indexPath.row)"
         cell.textLabel?.textColor = UIColor.white
         switch indexPath.row % 2 {
         case 0:
