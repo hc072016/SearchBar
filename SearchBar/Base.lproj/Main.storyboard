@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="portrait">
+    <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,28 +16,69 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="SearchBar" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="YFD-ge-5xb">
-                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <rect key="frame" x="0.0" y="44" width="375" height="734"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="EM9-A4-HBP"/>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="l8O-Gj-THl"/>
                                 </connections>
                             </tableView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oMI-NO-RO9" userLabel="Search Bar Background View">
+                                <rect key="frame" x="333" y="48" width="38" height="38"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="GTy-1y-8XJ">
+                                        <rect key="frame" x="4" y="4" width="30" height="30"/>
+                                        <subviews>
+                                            <textField hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" verticalHuggingPriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="80r-No-Jzt" userLabel="Search Bar Text Field">
+                                                <rect key="frame" x="-8" y="0.0" width="0.0" height="30"/>
+                                                <nil key="textColor"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                            </textField>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jWQ-Q2-d6h" userLabel="Search Bar Button">
+                                                <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="jWQ-Q2-d6h" secondAttribute="height" multiplier="1:1" placeholder="YES" id="D34-cW-eV9"/>
+                                                </constraints>
+                                                <state key="normal" image="magnifying-glass"/>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="jWQ-Q2-d6h" firstAttribute="leading" secondItem="80r-No-Jzt" secondAttribute="trailing" constant="8" symbolic="YES" placeholder="YES" id="xQQ-WQ-bLf"/>
+                                        </constraints>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.76078431372549016" green="1" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="GTy-1y-8XJ" secondAttribute="bottom" constant="4" placeholder="YES" id="5Qi-f9-oIj"/>
+                                    <constraint firstAttribute="trailing" secondItem="GTy-1y-8XJ" secondAttribute="trailing" constant="4" placeholder="YES" id="LvJ-9C-Yek"/>
+                                    <constraint firstItem="GTy-1y-8XJ" firstAttribute="leading" secondItem="oMI-NO-RO9" secondAttribute="leading" constant="4" placeholder="YES" id="OUj-WR-3jS"/>
+                                    <constraint firstItem="GTy-1y-8XJ" firstAttribute="top" secondItem="oMI-NO-RO9" secondAttribute="top" constant="4" placeholder="YES" id="svr-KV-2d8"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="oMI-NO-RO9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" placeholder="YES" id="GF4-AM-z6O"/>
                             <constraint firstItem="YFD-ge-5xb" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" placeholder="YES" id="Jpr-FE-95Z"/>
+                            <constraint firstItem="80r-No-Jzt" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" priority="250" placeholder="YES" id="LU9-Kp-yQp"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="YFD-ge-5xb" secondAttribute="trailing" placeholder="YES" id="Q6M-mh-dj1"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="YFD-ge-5xb" secondAttribute="bottom" placeholder="YES" id="R64-Jj-Cpd"/>
                             <constraint firstItem="YFD-ge-5xb" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" placeholder="YES" id="UiU-mR-eg9"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="oMI-NO-RO9" secondAttribute="trailing" constant="4" placeholder="YES" id="YRo-n9-wJI"/>
+                            <constraint firstItem="oMI-NO-RO9" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="4" placeholder="YES" id="snF-kM-8mD"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="searchBarBackgroundView" destination="oMI-NO-RO9" id="hJT-1P-Ee9"/>
+                        <outlet property="searchBarButton" destination="jWQ-Q2-d6h" id="i62-n4-xjR"/>
+                        <outlet property="searchBarStackView" destination="GTy-1y-8XJ" id="N9U-vW-qex"/>
+                        <outlet property="searchBarTextField" destination="80r-No-Jzt" id="4vb-Os-9Ox"/>
                         <outlet property="tableView" destination="YFD-ge-5xb" id="muB-ap-0JN"/>
                     </connections>
                 </viewController>
@@ -45,4 +87,7 @@
             <point key="canvasLocation" x="131.8840579710145" y="134.59821428571428"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="magnifying-glass" width="64" height="64"/>
+    </resources>
 </document>
