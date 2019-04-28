@@ -125,7 +125,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
                 self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
             }
-            self.view.layoutIfNeeded() // this one is needed somehowmm, by Apple. there is small glitch of animation of writing without this line
+            self.view.layoutIfNeeded() // this one is needed somehowmm, by Apple. there is small animation glitch without this line – the button shaking
         }
         
     }
@@ -149,6 +149,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
      // Configure the cell...
         cell.textLabel?.text = "#\(indexPath.row)"
         cell.textLabel?.textColor = UIColor.white
+        cell.selectionStyle = .none
         switch indexPath.row % 2 {
         case 0:
             cell.backgroundColor = UIColor.init(red: 255 / 255, green: 119 / 255, blue: 130 / 255, alpha: 1)
