@@ -7,16 +7,17 @@
 //
 
 //  constraints in storyboard are for visual demonstration, removed at build time.
-//  all constraints are set up in code
+//  all constraints are set up in code.
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
     static let defaultTableViewCellReuseIdentifier = "DefaultTableViewCell"
     static let defaultSearchBarBackgroundViewCornerRadius: CGFloat = 3
     static let searchBarBackgroundViewNarrowMargin: CGFloat = 0
     static let searchBarBackgroundViewWideMargin: CGFloat = 4
-    static let defaultSearchBarStackViewSpacing: CGFloat = 8
+    static let searchBarStackViewNarrowSpacing: CGFloat = 4
+    static let searchBarStackViewWideSpacing: CGFloat = 8
     static let searchBarStackViewNarrowMargin: CGFloat = 4
     static let searchBarStackViewWideMargin: CGFloat = 8
     
@@ -25,6 +26,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @IBOutlet weak var searchBarStackView: UIStackView!
     @IBOutlet weak var searchBarTextField: UITextField!
     @IBOutlet weak var searchBarButton: UIButton!
+    
+    let alphabetArray: Array = ["Α:α – alpha; transliterated as ‘a’", "Β:β – beta; transliterated as ‘b’", "Γ:γ – gamma; transliterated as ‘g’", "Δ:δ – delta; transliterated as ‘d’", "Ε:ε – epsilon; transliterated as ‘e’", "Ζ:ζ – zeta; transliterated as ‘z’", "Η:η – eta; transliterated as ‘e’ or ‘ē’", "Θ:θ – theta; transliterated as ‘th’", "Ι:ι – iota; transliterated as ‘i’", "Κ:κ – kappa; transliterated as ‘k’", "Λ:λ – lambda; transliterated as ‘l’", "Μ:μ – mu; transliterated as ‘m’", "Ν:ν – nu; transliterated as ‘n’", "Ξ:ξ – xi; transliterated as ‘x’", "Ο:ο omicron; transliterated as ‘o’", "Π:π – pi; transliterated as ‘p’", "Ρ:ρ – rho; transliterated as ‘r’ or (when written with a rough breathing) ‘rh’", "Σ:σ / ς(end of a word) sigma; transliterated as ‘s’", "Τ:τ – tau; transliterated as ‘t’", "Υ:υ – upsilon; transliterated as ‘u’ or (chiefly in English words derived through Latin) as ‘y’", "Φ:φ – phi; transliterated as ‘ph’ or (in modern Greek) ‘f’", "Χ:χ – chi; transliterated as ‘kh’ or ‘ch’", "Ψ:ψ – psi; transliterated as ‘ps’", "Ω:ω – omega; transliterated as ‘o’ or ‘ō’"]
+    var filteredResultArray: [String] = []
     
     var tableViewTopConstraint: NSLayoutConstraint?
     var searchBarBackgroundViewTopConstraint: NSLayoutConstraint?
@@ -62,7 +66,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // this makes the stack view as tall as the height of the taller of the two embedded views.
         searchBarStackView.alignment = .fill
         searchBarStackView.distribution = .fill
-        searchBarStackView.spacing = ViewController.defaultSearchBarStackViewSpacing
+        searchBarStackView.spacing = ViewController.searchBarStackViewNarrowSpacing
         searchBarStackView.translatesAutoresizingMaskIntoConstraints = false
         searchBarStackViewTopConstraint = searchBarStackView.topAnchor.constraint(equalTo: searchBarBackgroundView.topAnchor, constant: ViewController.searchBarStackViewNarrowMargin)
         searchBarStackViewTopConstraint?.isActive = true
@@ -73,13 +77,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         searchBarStackViewBottomConstraint = searchBarBackgroundView.bottomAnchor.constraint(equalTo: searchBarStackView.bottomAnchor, constant: ViewController.searchBarStackViewNarrowMargin)
         searchBarStackViewBottomConstraint?.isActive = true
         
+        searchBarTextField.delegate = self
+        searchBarTextField.addTarget(self, action: #selector(textFieldDidChangeEditing(_:)), for: .editingChanged)
+        searchBarTextField.returnKeyType = .done
+        searchBarTextField.clearButtonMode = .whileEditing
         // with a lower content hugging priority, text field expands while button stays the same
         searchBarTextField.setContentHuggingPriority(UILayoutPriority(249), for: .horizontal)
         // as text field has a content hugging priority of 751, which is larger than the button's compression resistance priority of 750, and the stack view's alignment is set to .fill, so the stack view will be set as tall as the text field
         // alternative: stackView.alignment = .center; one more constraint to make textField and button equal heights
         searchBarTextField.setContentHuggingPriority(UILayoutPriority(751), for: .vertical)
-        var searchBarTextFieldLayoutConstraint: NSLayoutConstraint
         searchBarTextField.translatesAutoresizingMaskIntoConstraints = false
+        var searchBarTextFieldLayoutConstraint: NSLayoutConstraint
         searchBarTextFieldLayoutConstraint = searchBarTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor)
         // as the setup of the stack view, essentially, searchBarTextField.leadingAnchor = searchBarBackgroundView.leadingAnchor + 4
         // searchBarBackgroundView.leadingAnchor is a required constraint, so is it not possible to satify both; however, unsatisfied optional constraints act as a pulling force, coming to closest to the constraints.
@@ -87,23 +95,25 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // when text field is hidden, background view collapses to around the button size; when text field is not hidden, background expands across the screen.
         searchBarTextFieldLayoutConstraint.priority = .defaultLow
         searchBarTextFieldLayoutConstraint.isActive = true
+        // the optional constraint anchor its leading anchor to the view.safeAreaLayoutGuide.leadingAnchor
+        // somehow, the animation has anchor point to the view.safeAreaLayoutGuide.leadingAnchor
+        // this constraint forces text field animates along with the background view
+        searchBarTextField.leadingAnchor.constraint(greaterThanOrEqualTo: searchBarBackgroundView.leadingAnchor).isActive = true
         
         searchBarButton.addTarget(self, action: #selector(searchBarButtonDidTap(_:)), for: .touchUpInside)
         searchBarButton.translatesAutoresizingMaskIntoConstraints = false
         searchBarButton.widthAnchor.constraint(equalTo: searchBarButton.heightAnchor).isActive = true
-        // this makes the expansion animation text field anchor to the button
-        // this constant must match the stackView.spacing, or else it would be an unsatisfied constraint
-        searchBarButton.leadingAnchor.constraint(equalTo: searchBarTextField.trailingAnchor, constant: ViewController.defaultSearchBarStackViewSpacing).isActive = true
     }
     
-    @objc func searchBarButtonDidTap(_ sender: Any) {
+    @objc private func searchBarButtonDidTap(_ sender: Any) {
         self.view.layoutIfNeeded() // this one is recommended to make sure layout is updated before the animation
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 3, delay: 0, options: .curveEaseInOut, animations: {
             if self.searchBarTextField.isHidden {
                 self.tableViewTopConstraint?.isActive = false
                 self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.searchBarBackgroundView.bottomAnchor)
                 self.tableViewTopConstraint?.isActive = true
                 self.searchBarTextField.isHidden = false
+                self.searchBarTextField.becomeFirstResponder() // so that keyboard animation is grouped together
                 self.searchBarBackgroundView.layer.cornerRadius = 0
                 self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
                 self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
@@ -111,11 +121,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewWideMargin
                 self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewWideMargin
                 self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewWideMargin
+                self.searchBarStackView.spacing = ViewController.searchBarStackViewWideSpacing
             } else {
                 self.tableViewTopConstraint?.isActive = false
                 self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor)
                 self.tableViewTopConstraint?.isActive = true
                 self.searchBarTextField.isHidden = true
+                self.searchBarTextField.resignFirstResponder() // so that keyboard animation is grouped together
                 self.searchBarBackgroundView.layer.cornerRadius = ViewController.defaultSearchBarBackgroundViewCornerRadius
                 self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
                 self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
@@ -124,13 +136,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
                 self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
                 self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
+                self.searchBarStackView.spacing = ViewController.searchBarStackViewNarrowSpacing
             }
             self.view.layoutIfNeeded() // this one is needed somehowmm, by Apple. there is small animation glitch without this line – the button shaking
+        }) { (finished) in
+            // empty for now
         }
-        
     }
     
-    // MARK: - Table view data source
+    // MARK: - UITableViewDataSource Protocol
     
     func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -139,16 +153,26 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 30
+        if isUsingFilteredResultArray() {
+            return filteredResultArray.count
+        } else {
+            return alphabetArray.count
+        }
     }
-    
     
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
      let cell = tableView.dequeueReusableCell(withIdentifier: ViewController.defaultTableViewCellReuseIdentifier, for: indexPath)
      
      // Configure the cell...
-        cell.textLabel?.text = "#\(indexPath.row)"
-        cell.textLabel?.textColor = UIColor.white
+        if isUsingFilteredResultArray() {
+            cell.textLabel?.text = filteredResultArray[indexPath.row]
+        } else {
+            cell.textLabel?.text = alphabetArray[indexPath.row]
+        }
+        cell.textLabel?.textColor = UIColor.init(white: 0.5, alpha: 1)
+        cell.textLabel?.adjustsFontSizeToFitWidth = true
+        cell.textLabel?.minimumScaleFactor = 0.8
+        cell.textLabel?.allowsDefaultTighteningForTruncation = true
         cell.selectionStyle = .none
         switch indexPath.row % 2 {
         case 0:
@@ -161,9 +185,42 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
      return cell
      }
     
-    // MARK: - Table view delegate
+    // MARK: - UITableViewDelegate Protocol
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         return nil
     }
+    
+    // MARK: - UITextFieldDelegate Protocol
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+//        populateFilteredResultArray(with: textField.text)
+        tableView.reloadData()
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        tableView.reloadData()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
+    }
+    
+    // MARK: -
+    @objc private func textFieldDidChangeEditing(_ textField: UITextField) {
+        populateFilteredResultArray(with: textField.text)
+        tableView.reloadData()
+    }
+    
+    private func populateFilteredResultArray(with string: String?) {
+        if let searchString = string, !searchString.isEmpty {
+            filteredResultArray = alphabetArray.filter({ (string) -> Bool in
+                return string.lowercased().contains(searchString.lowercased())
+            })
+        } else {
+            filteredResultArray = []
+        }
+    }
+    func isUsingFilteredResultArray() -> Bool {
+        return !searchBarTextField.isHidden && !(searchBarTextField.text?.isEmpty ?? true)
+    }
 }
-

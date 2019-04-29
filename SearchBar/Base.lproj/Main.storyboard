@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
@@ -34,7 +33,7 @@
                                         <rect key="frame" x="4" y="4" width="30" height="30"/>
                                         <subviews>
                                             <textField hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" verticalHuggingPriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="80r-No-Jzt" userLabel="Search Bar Text Field">
-                                                <rect key="frame" x="-8" y="0.0" width="0.0" height="30"/>
+                                                <rect key="frame" x="-4" y="0.0" width="0.0" height="30"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
@@ -47,9 +46,6 @@
                                                 <state key="normal" image="magnifying-glass"/>
                                             </button>
                                         </subviews>
-                                        <constraints>
-                                            <constraint firstItem="jWQ-Q2-d6h" firstAttribute="leading" secondItem="80r-No-Jzt" secondAttribute="trailing" constant="8" symbolic="YES" placeholder="YES" id="xQQ-WQ-bLf"/>
-                                        </constraints>
                                     </stackView>
                                 </subviews>
                                 <color key="backgroundColor" red="0.76078431372549016" green="1" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -57,6 +53,7 @@
                                     <constraint firstAttribute="bottom" secondItem="GTy-1y-8XJ" secondAttribute="bottom" constant="4" placeholder="YES" id="5Qi-f9-oIj"/>
                                     <constraint firstAttribute="trailing" secondItem="GTy-1y-8XJ" secondAttribute="trailing" constant="4" placeholder="YES" id="LvJ-9C-Yek"/>
                                     <constraint firstItem="GTy-1y-8XJ" firstAttribute="leading" secondItem="oMI-NO-RO9" secondAttribute="leading" constant="4" placeholder="YES" id="OUj-WR-3jS"/>
+                                    <constraint firstItem="80r-No-Jzt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="oMI-NO-RO9" secondAttribute="leading" placeholder="YES" id="QMe-R0-IO4"/>
                                     <constraint firstItem="GTy-1y-8XJ" firstAttribute="top" secondItem="oMI-NO-RO9" secondAttribute="top" constant="4" placeholder="YES" id="svr-KV-2d8"/>
                                 </constraints>
                             </view>
