@@ -6,6 +6,7 @@
 //  Copyright © 2019 Howie C. All rights reserved.
 //
 
+//  the main purpose is for demonstration of optional constraints and inequalities.
 //  constraints in storyboard are for visual demonstration, removed at build time.
 //  all constraints are set up in code.
 
@@ -43,7 +44,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.init(red: 194 / 255, green: 255 / 255, blue: 240 / 255, alpha: 1)
         
-        tableView.keyboardDismissMode = .onDrag
+        tableView.keyboardDismissMode = .interactive
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: ViewController.defaultTableViewCellReuseIdentifier)
         // constraint tableView to safe area
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -105,45 +106,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         searchBarButton.widthAnchor.constraint(equalTo: searchBarButton.heightAnchor).isActive = true
     }
     
-    @objc private func searchBarButtonDidTap(_ sender: Any) {
-        self.view.layoutIfNeeded() // this one is recommended to make sure layout is updated before the animation
-        UIView.animate(withDuration: 3, delay: 0, options: .curveEaseInOut, animations: {
-            if self.searchBarTextField.isHidden {
-                self.tableViewTopConstraint?.isActive = false
-                self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.searchBarBackgroundView.bottomAnchor)
-                self.tableViewTopConstraint?.isActive = true
-                self.searchBarTextField.isHidden = false
-                self.searchBarTextField.becomeFirstResponder() // so that keyboard animation is grouped together
-                self.searchBarBackgroundView.layer.cornerRadius = 0
-                self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
-                self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
-                self.searchBarStackViewTopConstraint?.constant = ViewController.searchBarStackViewWideMargin
-                self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewWideMargin
-                self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewWideMargin
-                self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewWideMargin
-                self.searchBarStackView.spacing = ViewController.searchBarStackViewWideSpacing
-            } else {
-                self.tableViewTopConstraint?.isActive = false
-                self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor)
-                self.tableViewTopConstraint?.isActive = true
-                self.searchBarTextField.isHidden = true
-                self.searchBarTextField.resignFirstResponder() // so that keyboard animation is grouped together
-                self.searchBarBackgroundView.layer.cornerRadius = ViewController.defaultSearchBarBackgroundViewCornerRadius
-                self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
-                self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
-                self.searchBarBackgroundView.layer.cornerRadius = ViewController.defaultSearchBarBackgroundViewCornerRadius
-                self.searchBarStackViewTopConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
-                self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
-                self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
-                self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
-                self.searchBarStackView.spacing = ViewController.searchBarStackViewNarrowSpacing
-            }
-            self.view.layoutIfNeeded() // this one is needed somehowmm, by Apple. there is small animation glitch without this line – the button shaking
-        }) { (finished) in
-            // empty for now
-        }
-    }
-    
     // MARK: - UITableViewDataSource Protocol
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -169,7 +131,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         } else {
             cell.textLabel?.text = alphabetArray[indexPath.row]
         }
-        cell.textLabel?.textColor = UIColor.init(white: 0.5, alpha: 1)
+        cell.textLabel?.textColor = UIColor.init(white: 0.4, alpha: 1)
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.textLabel?.minimumScaleFactor = 0.8
         cell.textLabel?.allowsDefaultTighteningForTruncation = true
@@ -191,17 +153,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     // MARK: - UITextFieldDelegate Protocol
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-//        populateFilteredResultArray(with: textField.text)
-        tableView.reloadData()
-    }
-    
     func textFieldDidEndEditing(_ textField: UITextField) {
-        tableView.reloadData()
+        if !searchBarTextField.isHidden {
+            setSearchBarHidden(true)
+        }
     }
     
+    // this method can be used for different search bar behaviour, e.g., keep search bar on screen while it is not first responder
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+        // instead of using searchBarTextField.resignFirstResponder(), keybaord dismissal animation is grouped with search bar dismissal animation
+        setSearchBarHidden(!searchBarTextField.isHidden)
         return false
     }
     
@@ -220,7 +181,55 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             filteredResultArray = []
         }
     }
+    
     func isUsingFilteredResultArray() -> Bool {
         return !searchBarTextField.isHidden && !(searchBarTextField.text?.isEmpty ?? true)
+    }
+    
+    @objc private func searchBarButtonDidTap(_ sender: Any) {
+        setSearchBarHidden(!searchBarTextField.isHidden)
+    }
+    
+    private func setSearchBarHidden(_ hidden: Bool) {
+        if searchBarTextField.isHidden != hidden {
+            self.view.layoutIfNeeded() // this one is recommended to make sure layout is updated before the animation
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+                if hidden {
+                    self.tableViewTopConstraint?.isActive = false
+                    self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor)
+                    self.tableViewTopConstraint?.isActive = true
+                    self.searchBarTextField.isHidden = true
+                    self.searchBarTextField.resignFirstResponder() // so that keyboard animation is grouped together
+                    self.tableView.reloadData()
+                    self.searchBarBackgroundView.layer.cornerRadius = ViewController.defaultSearchBarBackgroundViewCornerRadius
+                    self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
+                    self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewWideMargin
+                    self.searchBarBackgroundView.layer.cornerRadius = ViewController.defaultSearchBarBackgroundViewCornerRadius
+                    self.searchBarStackViewTopConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
+                    self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
+                    self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
+                    self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewNarrowMargin
+                    self.searchBarStackView.spacing = ViewController.searchBarStackViewNarrowSpacing
+                } else {
+                    self.tableViewTopConstraint?.isActive = false
+                    self.tableViewTopConstraint = self.tableView.topAnchor.constraint(equalTo: self.searchBarBackgroundView.bottomAnchor)
+                    self.tableViewTopConstraint?.isActive = true
+                    self.searchBarTextField.isHidden = false
+                    self.searchBarTextField.becomeFirstResponder() // so that keyboard animation is grouped together
+                    self.tableView.reloadData()
+                    self.searchBarBackgroundView.layer.cornerRadius = 0
+                    self.searchBarBackgroundViewTopConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
+                    self.searchBarBackgroundViewTrailingConstraint?.constant = ViewController.searchBarBackgroundViewNarrowMargin
+                    self.searchBarStackViewTopConstraint?.constant = ViewController.searchBarStackViewWideMargin
+                    self.searchBarStackViewLeadingConstraint?.constant = ViewController.searchBarStackViewWideMargin
+                    self.searchBarStackViewTrailingConstraint?.constant = ViewController.searchBarStackViewWideMargin
+                    self.searchBarStackViewBottomConstraint?.constant = ViewController.searchBarStackViewWideMargin
+                    self.searchBarStackView.spacing = ViewController.searchBarStackViewWideSpacing
+                }
+                self.view.layoutIfNeeded() // this one is needed somehowmm, by Apple. there is small animation glitch without this line – the button shaking
+            }) { (finished) in
+                // empty for now
+            }
+        }
     }
 }
