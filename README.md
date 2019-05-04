@@ -4,3 +4,5 @@ Don’t feel obligated to use all 1000 priority values. In fact, priorities shou
 -- Auto Layout Guide by Apple
 
 iOS 12.2 (16E227), Version 10.2.1 (10E1001)
+
+![screen shot](https://user-images.githubusercontent.com/27608286/57174099-266cc600-6e07-11e9-9a2f-3a615c74d2ca.png)
